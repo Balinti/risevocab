@@ -1,21 +1,14 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Inter } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/lib/AuthContext";
+import Header from "@/components/Header";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "RiseVocab - Build Your Vocabulary",
-  description: "Master new words and expand your vocabulary with RiseVocab",
+  title: "RiseVocab - Business Communication Microtraining",
+  description: "Write more naturally at work with 10-minute scenario drills and instant AI feedback",
 };
 
 export default function RootLayout({
@@ -25,10 +18,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body className={`${inter.className} antialiased bg-slate-900 text-slate-100 min-h-screen`}>
+        <AuthProvider>
+          <Header />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

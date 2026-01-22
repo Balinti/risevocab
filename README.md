@@ -1,36 +1,134 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RiseVocab
 
-## Getting Started
+Business communication microtraining web app that helps non-native professionals write more naturally at work using 10-minute scenario drills, instant AI feedback, and lightweight spaced repetition.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Try without login**: Start practicing immediately with the free Office Basics track
+- **Scenario Drills**: Rewrite, tone adjustment, cloze collocations, and short reply exercises
+- **AI Feedback**: Instant feedback with tone analysis, scores, and multiple rewrite suggestions
+- **Message Repair**: Paste any message and get a professional rewrite (metered usage)
+- **Spaced Repetition**: Lightweight SRS for reviewing phrases at optimal intervals
+- **Phrasebook**: Save and organize professional phrases for quick reference
+
+## Tech Stack
+
+- Next.js 14 (App Router)
+- TypeScript
+- Tailwind CSS
+- Supabase (auth + database)
+- Stripe (subscriptions)
+- OpenAI (AI feedback)
+
+## Environment Variables
+
+### Required (from shared team)
+
+```env
+# App Database (Supabase)
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+
+# Stripe
+STRIPE_SECRET_KEY=
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+STRIPE_WEBHOOK_SECRET=
+
+# OpenAI (optional - fallback feedback works without it)
+OPENAI_API_KEY=
+
+# Database URL (for migrations)
+DATABASE_URL=
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Project-Specific
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```env
+# App URL
+NEXT_PUBLIC_APP_URL=https://risevocab.vercel.app
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Stripe Price IDs (optional - upgrade buttons hidden if missing)
+NEXT_PUBLIC_STRIPE_PLUS_PRICE_ID=
+NEXT_PUBLIC_STRIPE_PRO_PRICE_ID=
+```
 
-## Learn More
+### Hardcoded (do not change)
 
-To learn more about Next.js, take a look at the following resources:
+- Shared Auth Supabase URL: `https://api.srv936332.hstgr.cloud`
+- App Slug: `risevocab`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Local Development
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+# Install dependencies
+npm install
 
-## Deploy on Vercel
+# Run development server
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Database Migrations
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Run migrations against your Supabase database:
+
+```bash
+# Using psql
+psql $DATABASE_URL -f supabase/migrations/0001_schema.sql
+psql $DATABASE_URL -f supabase/migrations/0002_rls.sql
+```
+
+## Deployment
+
+The app is deployed to Vercel:
+
+```bash
+# Deploy to preview
+npx vercel
+
+# Deploy to production
+npx vercel --prod
+```
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── layout.tsx          # Root layout with AuthProvider
+│   ├── page.tsx            # Landing page
+│   ├── app/
+│   │   ├── page.tsx        # Main practice dashboard
+│   │   ├── drill/[id]/     # Individual drill pages
+│   │   ├── review/         # SRS review queue
+│   │   ├── message-repair/ # Message repair tool
+│   │   └── phrasebook/     # Saved phrases
+│   ├── pricing/            # Pricing page
+│   ├── account/            # Account management
+│   └── api/
+│       ├── feedback/       # AI feedback endpoint
+│       ├── srs/grade/      # SRS grading endpoint
+│       ├── stripe/         # Stripe checkout & webhook
+│       └── subscription/   # Subscription status
+├── components/
+│   ├── GoogleAuth.tsx      # Google OAuth button
+│   ├── Header.tsx          # Site header
+│   ├── DrillCard.tsx       # Drill input component
+│   ├── FeedbackDisplay.tsx # Feedback display
+│   ├── SoftSavePrompt.tsx  # Sign-in prompt modal
+│   ├── PaywallModal.tsx    # Upgrade prompt modal
+│   └── TonePicker.tsx      # Tone selection
+└── lib/
+    ├── AuthContext.tsx     # Auth state management
+    ├── authSharedClient.ts # Shared auth Supabase client
+    ├── supabaseAppClient.ts# App database client
+    ├── localStore.ts       # localStorage utilities
+    ├── srs.ts              # Spaced repetition logic
+    ├── contentSeed.ts      # Fallback content data
+    ├── entitlements.ts     # Subscription features
+    └── stripe.ts           # Stripe utilities
+```
+
+## License
+
+Proprietary - All rights reserved
